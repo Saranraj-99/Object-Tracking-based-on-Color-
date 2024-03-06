@@ -9,26 +9,27 @@ import cv2 #Opening CV
 
 redLower = (58, 95, 80)
 redUpper = (147, 255, 255)
+#Implementing Background Subtraction
 
 camera=cv2.VideoCapture(0) #Obtain feed from camera
+
 while True:
 
         (grabbed, frame) = camera.read() #Read from the Camera
 
-    frame = imutils.resize(frame, width=1000) #Resizing the Image
-    blurred = cv2.GaussianBlur(frame, (11, 11), 0) #Smoothening the Image 
+        frame = imutils.resize(frame, width=1000) #Resizing the Image
+        blurred = cv2.GaussianBlur(frame, (11, 11), 0) #Smoothening the Image
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV) #Converting the Color to Gray Scale Image
-    
 
         mask = cv2.inRange(hsv, redLower, redUpper) #Mask the blue colour
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 
 
-        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, #Grabing all the Borders
                 cv2.CHAIN_APPROX_SIMPLE)[-2]
         center = None
-        if len(cnts) > 0: #Capture frame-by-frame
+        if len(cnts) > 0:
                 c = max(cnts, key=cv2.contourArea)
                 ((x, y), radius) = cv2.minEnclosingCircle(c)
                 M = cv2.moments(c)
@@ -36,8 +37,7 @@ while True:
                 if radius > 10:
                         cv2.circle(frame, (int(x), int(y)), int(radius),
                                 (0, 255, 255), 2)
-                        cv2.circle(frame, center, 5, (0, 0, 255), -1)
-                        #print(center,radius)
+                        cv2.circle(frame, center, 5, (0, 0, 255), -1) # print(contours)
                         if radius > 250:
                                 print("stop") #Display the resulting frame
                         else:
